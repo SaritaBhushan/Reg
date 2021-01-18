@@ -1,0 +1,9 @@
+Django==1.11.23
+django-countries==7.0
+django-crispy-forms==1.10.0
+djangorestframework==3.6.3
+mysql-connector==2.2.9
+mysqlclient==2.0.3
+pymongo==3.11.2
+pytz==2020.5
+PyYAML==5.3.1
