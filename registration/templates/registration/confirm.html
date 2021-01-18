@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <label align=center><font size="5">Response is as follows: </font></label>
+    <label align=center><font size="5">{{ detailerror.content }}</font></label>
+    {% if detailerror.content == "Registration Successful." %}
+      <a class="nav-link" href="{% url 'register' %}">Click here to register another user.</a>
+      <a class="nav-link" href="http://10.129.103.143/login?next=%2F">Click here to login.</a>
+    <!-- {% elif detailerror.content == "Username already exists. Please choose another username." %}
+      <a class="nav-link" href="{% url 'register' %}>Click here to register another user.</a> -->
+    {% endif %}
+
+  {% endblock %}

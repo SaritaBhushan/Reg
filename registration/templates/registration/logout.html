@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block body %}
+<!-- <h4>Register page</h4>
+<p>This is home page </p>
+<h1>I AM TRYING.</h1> -->
+  <form  method="post">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" value="Logout">
+    <!-- <button>Register</button> -->
+  </form>
+{% endblock %}
