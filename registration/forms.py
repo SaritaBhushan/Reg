@@ -186,7 +186,7 @@ LEVEL_OF_EDUCATION_CHOICES = (
 class RegisterationForm(forms.Form):
     email = forms.CharField(label='Email Id', required=True, max_length=254,  widget=forms.TextInput(attrs={'placeholder': 'Email'}))
 
-    firstname = forms.CharField(label='First Name', required=True, max_length=30, widget=forms.TextInput(attrs={'placeholder': 'First Name'}) ) #autocomplete='off',
+    firstname = forms.CharField(label='First Name', required=False, max_length=30, widget=forms.TextInput(attrs={'placeholder': 'First Name'}) ) #autocomplete='off',
     lastname = forms.CharField(label='Last Name', required=False, max_length=30, widget=forms.TextInput(attrs={'placeholder': 'Last Name'}) ) #autocomplete='off',
     gender = forms.ChoiceField(label='Gender', required=False, choices=GENDER_CHOICES)
     year_of_birth = forms.ChoiceField(label='Year of Birth', required=False, choices=YEARS)
