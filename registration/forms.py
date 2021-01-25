@@ -1,11 +1,11 @@
 from django import forms
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit, Row, Column
 from django.contrib.auth.models import User
 from django.urls import reverse
 
+
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, Div, Fieldset, ButtonHolder
+from crispy_forms.layout import Layout, Submit, Row, Column
 from crispy_forms.bootstrap import Field, InlineRadios, TabHolder, Tab
 from crispy_forms.bootstrap import (
     PrependedText )
@@ -13,6 +13,8 @@ from crispy_forms.bootstrap import (
 
 from datetime import datetime, timedelta
 from pytz import UTC
+
+from registration import edx_services
 
 this_year = datetime.now(UTC).year
 VALID_YEARS = list(range(this_year, this_year - 120, -1))
@@ -183,6 +185,7 @@ LEVEL_OF_EDUCATION_CHOICES = (
         # Translators: 'Other' refers to the student's level of education
         ('other', "Other education")
     )
+
 class RegisterationForm(forms.Form):
     email = forms.CharField(label='Email Id', required=True, max_length=254,  widget=forms.TextInput(attrs={'placeholder': 'Email'}))
 
@@ -232,7 +235,7 @@ class RegisterationForm(forms.Form):
         cleaned_data = super(RegisterationForm, self).clean()
         password = cleaned_data.get("password")
         confirm_password = cleaned_data.get("confirm_password")
-        print(password, confirm_password)
+        # print(password, confirm_password)
 
         # if password != confirm_password:
         #     self.add_error('confirm_password', "Password does not match")
@@ -249,7 +252,7 @@ class RegisterationForm(forms.Form):
             site.
         """
         username = self.cleaned_data['username']
-        print("clean_username",  self.cleaned_data['username'])
+        # print("clean_username",  self.cleaned_data['username'])
         if len(self.cleaned_data['username'])<4:
             raise forms.ValidationError('Username should have Minimum 4 Charecters.')
         return self.cleaned_data['username']
@@ -258,7 +261,7 @@ class RegisterationForm(forms.Form):
             User.objects.get(username=username)
         except User.DoesNotExist:
             return username
-        raise forms.ValidationError("121That user is already taken , please select another ")
+        raise forms.ValidationError("That user is already taken , please select another ")
 
         if User.objects.filter(username__iexact=self.cleaned_data['username']):
             raise forms.ValidationError('Username already exists. 123Please choose another username.')
@@ -270,7 +273,7 @@ class RegisterationForm(forms.Form):
         Validate that the supplied email address is unique for the
         site.
         """
-        print("clean_email", self.cleaned_data['email'])
+        # print("clean_email", self.cleaned_data['email'])
         f = forms.EmailField()
         try:
             f.clean(self.cleaned_data['email'])
@@ -291,3 +294,43 @@ class RegisterationForm(forms.Form):
         if len(self.cleaned_data['password'])<8:
             raise forms.ValidationError('Password should have Minimum 8 Charecters.')
         return self.cleaned_data['password']
+
+class EnrollForm(forms.Form):
+    """docstring for ."""
+    learner = forms.ChoiceField(label="Select Learner", required=True)
+    course = forms.ChoiceField(label="Select Course", required=True)
+
+    class Meta:
+        model = User
+        fields = ("username")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # resp = User.objects.all().order_by("username")  # it is OK
+        # resp = User.objects.get(is_active=1).order_by("username")  # it is NOT OK
+        resp = User.objects.filter(is_active=1).order_by("username")  # it is also OK
+
+        # print("resp", resp)
+        userList = []
+
+        i=1
+        userList.append([])
+        userList[0].append('')
+        userList[0].append("Choose...")
+        for item in resp:  # self.roles:
+            userList.append([])#Adding empty List for Each Platform
+            userList[i].append(item.id)#Populating the list with id and platform_name
+            userList[i].append(item.username)
+            i = i+1
+
+        self.fields['learner'] = forms.ChoiceField(choices=userList)
+
+        # Openedx Courses
+        edxCourses_obj= edx_services.EdxCourses()
+        courses_response = edxCourses_obj.edxCourses("GET", None)
+        # print("courses_response", courses_response)
+        self.fields['course'] = forms.ChoiceField(choices=courses_response.Result)
+
+    def clean(self):
+        cleaned_data = super(EnrollForm, self).clean()
+        return cleaned_data

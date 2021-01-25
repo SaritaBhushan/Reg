@@ -1,8 +1,8 @@
 from django.shortcuts import render
-
-from registration.forms import RegisterationForm, AddressForm
+from django.db import transaction
+from registration.forms import RegisterationForm, AddressForm, EnrollForm
 from registration import edx_services
-
+from registration.edx_services import AlreadyExistError, edXServicesError
 from django.template.context_processors import csrf
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -84,6 +84,55 @@ def register(request):
         userform = RegisterationForm()
 
     return render(request, "registration/register.html", {'form': userform,})
+
+@transaction.atomic
+def enroll(request):
+    if request.method == 'POST':
+        print("POST ======================")
+        # print("Method POST", request.method)
+        enrollForm = EnrollForm(request.POST)
+        if enrollForm.is_valid():
+            learner = enrollForm.cleaned_data['learner']
+            learner_name = enrollForm.cleaned_data.get('learner')
+            course = enrollForm.cleaned_data['course']
+            print("\n\n\t\t\t\t***** learner, course:",learner, course)
+            # print("\n\n***** learner_name",learner_name, learner)
+            # edx service
+
+            try:
+                enroll_obj = edx_services.EnrollUser()
+                enroll_response = enroll_obj.enrollUser(learner,course)
+                print("courses_response", enroll_response, enroll_response.status_code)
+                if enroll_response.status_code != 201:
+                    enrollForm = EnrollForm()
+                    messages.success(request, "User is not Enroll for the course "+ course + ". Reasons: " + enroll_response.ErrMsg)
+                    return render(request, "registration/course_Enroll.html", {'form': enrollForm,})
+                print("======================")
+            except AlreadyExistError as e:
+                print("\t\t\t@@81 MySQL @edxe@: ",type(e),e)
+                enrollForm.add_error('learner', e)
+                context = {}
+                context['form']= enrollForm
+                return render(request, 'registration/course_Enroll.html', context)
+            except edXServicesError as e:
+                print("@@83 MySQL @edxe@: ",type(e),e)
+                messages.success(request, e)
+                return render(request, 'registration/course_Enroll.html', {'form': enrollForm,})
+            # except Exception as e:
+            #     print("@@82 MySQL @edxe@: ",type(e),e)
+            #     messages.success(request, e)
+            #     return render(request, "registration/course_Enroll.html", {'form': enrollForm,})
+
+            enrollForm = EnrollForm()
+            messages.success(request, learner_name +" Enroll for the course "+ course +" sucessfully")
+            return render(request, "registration/course_Enroll.html", {'form': enrollForm,})
+        # return render(request, "registration/confirm.html")
+        # return render(request, "registration/course_Enroll.html")
+    else:
+        print("GET ======================")
+        print("Method OTHER", request.method)
+        enrollForm = EnrollForm()
+        return render(request, "registration/course_Enroll.html", {'form': enrollForm,})
 
 def crispy_register(request):
     if request.method == 'POST':

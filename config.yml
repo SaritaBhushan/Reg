@@ -1,13 +1,15 @@
 # OpenEdx Platform details
-# mongo Details
+# mongodb Details
 mongo_server: ""
 mongo_pwd: ""
 mongo_user: ""
 mongo_port: "27017"
-mongo_authSource: ""
+mongo_authSource: "admin"
 
 # MySQL server Details
 mysql_server: ""
 mysql_pwd: ""
 mysql_user: ""
 mysql_port: "3306"
+
+EDXAPP_EDXAPP_SECRET_KEY: ''

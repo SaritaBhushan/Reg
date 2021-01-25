@@ -22,6 +22,8 @@ urlpatterns = [
     # url(r'^$', home.as_view(), name='home'),
     url(r'^$', views.home, name='home'),
     url(r'^register/', views.register, name='register'),
+    url(r'^enroll/', views.enroll, name='enroll'),
+    url(r'^confirm/', views.enroll, name='confirm'),
     url(r'^crispy_register/', views.crispy_register, name='crispy_register'),
 
     # path('', views.home, name='home'),
