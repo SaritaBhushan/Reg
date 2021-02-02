@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from six import text_type
 
 
-# SECRET_KEY is the “EDXAPP_EDXAPP_SECRET_KEY” of IITBomayX available in the file “home/edx/my-passwords.yml”.
+# SECRET_KEY is the “EDXAPP_EDXAPP_SECRET_KEY” of IITBombayX available in the file “home/edx/my-passwords.yml”.
 SECRET_KEY = 'BjTwggREbpe2DnnDi7DwIDq62Evkx74d0JvypPqr9V3QOuPaw7zoranYvrwMm9VMpiKUewN4Kl0sNUCijZgVKHbWaZeQJPLMh5Rl'
 
 
